@@ -1,34 +1,45 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white p-8">
-    <div v-if="manga" class="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md">
-      <img :src="manga.coverImage" alt="Cover" class="w-full h-96 object-cover mb-6 rounded" />
-      <h2 class="text-3xl font-bold mb-2">{{ manga.title }}</h2>
-      <p class="text-sm text-gray-400 mb-2">By {{ manga.author }}</p>
-      <p class="mb-4">{{ manga.description }}</p>
-      <div class="text-sm">
-        <p><strong>Genre:</strong> {{ manga.genre }}</p>
-        <p><strong>Price:</strong> ${{ manga.price }}</p>
-        <p><strong>Stock:</strong> {{ manga.stock }}</p>
-      </div>
+  <div class="min-h-screen p-8 bg-gray-900 text-white flex gap-6">
+    <!-- Left: Manga Info -->
+    <div class="w-2/3">
+      <img :src="manga.coverImage" alt="cover" class="w-full h-auto rounded" />
+    <div class="mt-4">
+    <h1 class="text-3xl font-bold mb-2">{{ manga.title }}</h1>
+    <p class="text-lg text-gray-400 mb-1">Author: {{ manga.author }}</p>
+    <p class="text-lg text-gray-400 mb-1">Genre: {{ manga.genre }}</p>
+    <p class="text-lg text-gray-400 mb-1">Price: ${{ manga.price }}</p>
+    <p class="mt-4">{{ manga.description }}</p>
+  </div>
+  </div> 
+
+    <!-- Right: Purchase Options -->
+    <div class="w-1/3 bg-gray-800 p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-bold mb-4">Buy Now</h2>
+      <button @click="buyNow" class="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded mb-3">
+        Buy Now
+      </button>
+      <button class="w-full bg-green-600 hover:bg-green-700 py-2 rounded">
+        Add to Cart
+      </button>
     </div>
-    <div v-else class="text-center text-red-400">Loading manga details...</div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
-const manga = ref(null)
 const route = useRoute()
+const router = useRouter()
+const manga = ref({})
 
 onMounted(async () => {
-  try {
-    const res = await axios.get(`http://localhost:5000/api/manga/${route.params.id}`)
-    manga.value = res.data
-  } catch (err) {
-    console.error('Failed to fetch manga:', err)
-  }
+  const res = await axios.get(`http://localhost:5000/api/mangas/${route.params.id}`)
+  manga.value = res.data
 })
+
+const buyNow = () => {
+  router.push({ name: 'Checkout', query: { id: route.params.id } })
+}
 </script>
